@@ -10,21 +10,10 @@ namespace ApiAPP.Models
 {
     public class Usuario
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("id")]
-        public string Id { get; set; }
-
-        [BsonElement("Nome")]
+        public string UsuarioId { get; set; }
         public string Nome { get; set; } = default!;
-
-        // [BsonElement("Email")]
-        // public string Email { get; set; } = default!;
-
-        // [BsonElement("Telefone")]
-        // public string Telefone { get; set; } = default!;
-
-        // public string FotoUrl { get; set; } = default!;
-        //public IEnumerable<Relatorio> Relatorios { get; set; } = default!;
+        public string Email { get; set; } = default!;
+        public string Telefone { get; set; } = default!;
+        public string FotoUrl { get; set; } = default!;
     }
 }

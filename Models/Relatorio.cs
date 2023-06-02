@@ -11,47 +11,19 @@ namespace ApiAPP.Models
 {
     public class Relatorio
     {
-        [BsonId]
-        [BsonRepresentation(BsonType.ObjectId)]
-        [JsonProperty("id")]
         public string Id { get; set; }
-
-        [BsonElement("nomeLocal")]
         public string NomeLocal { get; set; } = default!;
-
-        // [BsonElement("notaIntrodutoria")]
-        // public string NotaIntrodutoria { get; set; } = default!;
-        // [BsonElement("origem")]
-        // public string Origem { get; set; } = default!;
-
-        // [BsonElement("Spu")]
-        // public string Spu { get; set; } = default!;
-
-        // [BsonElement("vinculacao")]
-        // public string Vinculacao { get; set; } = default!;
-        // [BsonElement("entidadeOrgao")]
-        // public string EntidadeOrgao { get; set; } = default!;
-
-        // [BsonElement("FotoUrl")]
-        // public string FotoUrl { get; set; } = default!;
-
-        // [BsonElement("EquipamentoPublico")]
-        // public string EquipamentoPublico { get; set; } = default!;
-
-        // [BsonElement("EnderecoLocal")]
-        // public string EnderecoLocal { get; set; } = default!;
-
-        // [BsonElement("DataCriacao")]
-        // [BsonDateTimeOptions]
-        // public DateTime DataCriacao { get; set; }
-
-        // [BsonDateTimeOptions]
-        // [BsonElement("DataModificacao")]
-        //public DateTime? DataModificacao { get; set; }
-
-        [BsonElement("UsuarioId")]
+        public string NotaIntrodutoria { get; set; } = default!;
+        public string Origem { get; set; } = default!;
+        public string Spu { get; set; } = default!;
+        public string Vinculacao { get; set; } = default!;
+        public string EntidadeOrgao { get; set; } = default!;
+        public string FotoUrl { get; set; } = default!;
+        public string EquipamentoPublico { get; set; } = default!;
+        public string EnderecoLocal { get; set; } = default!;
+        public DateTime DataCriacao { get; set; }
+        public DateTime? DataModificacao { get; set; }
         public string UsuarioId { get; set; }
         public Usuario Usuario { get; set; }
-
     }
 }
