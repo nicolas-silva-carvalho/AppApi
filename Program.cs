@@ -11,6 +11,7 @@ using AppApi.Services;
 using ApiAPP.Models;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.OpenApi.Models;
+using ApiAPP.Data.Map;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,13 +33,17 @@ builder.Services
         };
     });
 
+builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 builder.Services.AddCors();
 builder.Services.Configure<ApiAppDatabase>(builder.Configuration.GetSection("RelatorioDatabase"));
 
 builder.Services.AddSingleton<ApiAppDatabase>();
-builder.Services.AddSingleton<AppService>();
 
+builder.Services.AddScoped<ProfileAPP>();
+builder.Services.AddSingleton<AppService>();
+builder.Services.AddSingleton<UsuarioService>();
 builder.Services.AddScoped<IToken, TokenService>();
+
 
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();

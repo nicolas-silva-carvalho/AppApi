@@ -8,7 +8,6 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ApiAPP.Controllers;
 
-[Authorize]
 [ApiController]
 [Route("[controller]")]
 
@@ -42,19 +41,20 @@ public class AppController : ControllerBase
         await _appService.PegarRelatoriosTotal();
         
 
-    [HttpGet("id")]
-    public async Task<List<Relatorio>> Get(string id)
-    {
-        var relatorio = await _appService.PegarRelatorioPorIdUsuario(id);
-        return relatorio;
-    }
+    // [HttpGet("id")]
+    // public async Task<List<Relatorio>> Get(string id)
+    // {
+    //     var relatorio = await _appService.PegarRelatorioPorIdUsuario(id);
+    //     return relatorio;
+    // }
 
     [HttpPost]
+    [AllowAnonymous]
     public async Task<IActionResult> Post(Relatorio relatorio)
     {
         await _appService.CriarRelatorio(relatorio);
 
-        return CreatedAtAction(nameof(Get), new { id = relatorio.Id }, relatorio);
+        return CreatedAtAction(nameof(Get), new { id = relatorio.RelatorioId }, relatorio);
     }
 
     [HttpPut("id")]
@@ -67,7 +67,7 @@ public class AppController : ControllerBase
             return NotFound();
         }
 
-        atualizarRelatorio.Id = relatorio.Id;
+        atualizarRelatorio.RelatorioId = relatorio.RelatorioId;
 
         await _appService.AtualizarRelatorio(id, atualizarRelatorio);
 

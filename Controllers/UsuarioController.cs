@@ -1,29 +1,25 @@
-using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Headers;
-using System.Security.Claims;
-using System.Text;
-using ApiAPP.Data;
-using ApiAPP.Models;
 using ApiAPP.Services;
-using AppApi.Services;
-using Microsoft.AspNetCore.Authorization;
+using ApiAPP.Models;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.IdentityModel.Tokens;
-namespace ApiAPP.Controllers;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
+using MongoDB.Bson;
+using Microsoft.AspNetCore.Authorization;
+using AppApi.Services;
+using AutoMapper;
 
-[Authorize]
 [ApiController]
 [Route("[controller]")]
 public class UsuarioController : ControllerBase
 {
-    private readonly IConfiguration _config;
     private readonly IToken _token;
-    private readonly AppService _appService;
-    public UsuarioController(IConfiguration config, IToken token, AppService appService)
+    private readonly UsuarioService _usuarioService;
+    private readonly IMapper _mapp;
+    public UsuarioController(IToken token, UsuarioService usuarioService, IMapper mapp)
     {
-        _appService = appService;
+        _mapp = mapp;
+        _usuarioService = usuarioService;
         _token = token;
-        _config = config;
     }
 
     [HttpPost("Login")]
@@ -32,16 +28,18 @@ public class UsuarioController : ControllerBase
     {
         try
         {
-            var usuarioNome = await _appService.PegarUsuarioPorNome(usuario.NomeUsuario);
+            var login = _mapp.Map<Usuario>(usuario);
+
+            var usuarioNome = await _usuarioService.PegarUsuarioPorNome(usuario.NomeUsuario);
             if(usuarioNome == null) return Unauthorized("Usuário inválido.");
 
-            var usuarioSenha = await _appService.PegarUsuarioPorSenha(usuario.Senha);
+            var usuarioSenha = await _usuarioService.PegarUsuarioPorSenha(usuario.Senha);
             if(usuarioSenha == null) return Unauthorized();
 
             return Ok(new 
             {
-                nomeUsuario  = usuario.NomeUsuario,
-                emailUsuario = usuario.Senha,
+                nomeUsuario  = login.Nome,
+                email = login.Email,
                 token = _token.CriarToken(usuario).Result
             });
         }
@@ -51,6 +49,21 @@ public class UsuarioController : ControllerBase
             $"Erro ao tentar recuperar usuários. Erro: {ex.Message}");
         }
     }
+
+    [HttpGet]
+    [AllowAnonymous]
+    public async Task<List<Usuario>> Get() =>
+        await _usuarioService.PegarUsuariosTotal();
+
+    [HttpPost("Registrar")]
+    [AllowAnonymous]
+    public async Task<IActionResult> Registrar(Usuario usuario)
+    {
+        await _usuarioService.CriarUsuario(usuario);
+
+        return CreatedAtAction(nameof(Get), new { id = usuario.UsuarioId }, usuario);
+    }
+
 
     // [HttpPost("Registrar")]
     // [AllowAnonymous]

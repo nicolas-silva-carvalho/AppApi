@@ -32,7 +32,7 @@ namespace ApiAPP.Services
 
 
         public async Task<Relatorio> PegarRelatorioId(string id) =>
-            await _mongoColletion.Find(x => x.Id == id).FirstOrDefaultAsync();
+            await _mongoColletion.Find(x => x.RelatorioId == id).FirstOrDefaultAsync();
 
 
         public async Task CriarRelatorio(Relatorio relatorio) =>
@@ -40,28 +40,17 @@ namespace ApiAPP.Services
 
 
         public async Task AtualizarRelatorio(string id, Relatorio atualizarRelatorio) =>
-            await _mongoColletion.ReplaceOneAsync(x => x.Id == id, atualizarRelatorio);
+            await _mongoColletion.ReplaceOneAsync(x => x.RelatorioId == id, atualizarRelatorio);
 
 
         public async Task RemoverRelatorioPorId(string id) =>
-         await _mongoColletion.DeleteOneAsync(x => x.Id == id);
+         await _mongoColletion.DeleteOneAsync(x => x.RelatorioId == id);
 
         public async Task<List<Relatorio>> PegarRelatorioPorIdUsuario(string usuarioId)
         {
             var filter = Builders<Relatorio>.Filter.Eq("UsuarioId", usuarioId);
             var relatorios = _mongoColletion.Find(filter).ToList();
             return relatorios;
-        }
-
-        public async Task<Relatorio> PegarUsuarioPorNome(string nome) => 
-            await _mongoColletion.Find(x => x.Usuario.Nome == nome).SingleOrDefaultAsync();
-          
-    
-
-        public async Task<Relatorio> PegarUsuarioPorSenha(string senha)
-        {
-            var senhaUser = await _mongoColletion.Find(x => x.Usuario.Senha == senha).SingleOrDefaultAsync();
-            return senhaUser;
         }
     }
 }

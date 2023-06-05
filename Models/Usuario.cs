@@ -11,6 +11,7 @@ namespace ApiAPP.Models
 {
     public class Usuario
     {
+        [BsonId]
         public string UsuarioId { get; set; }
         public string Nome { get; set; } = default!;
         public string Senha { get; set; } = default!;

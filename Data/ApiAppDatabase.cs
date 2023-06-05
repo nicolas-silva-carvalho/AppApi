@@ -12,5 +12,6 @@ namespace ApiAPP.Data
         public string DatabaseName { get; set; } = null!;
 
         public string RelatoriosCollectionName { get; set; } = null!;
+        public string UsuarioCollectionName { get; set; } = null!;
     }
 }
