@@ -1,44 +1,91 @@
-using ApiAPP.Data;
+using ApiAPP.Services;
 using ApiAPP.Models;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using MongoDB.Driver;
+using MongoDB.Driver.Core.Configuration;
+using MongoDB.Bson;
+using Microsoft.AspNetCore.Authorization;
 
 namespace ApiAPP.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
+
 public class AppController : ControllerBase
 {
-    [HttpGet]
-    public string get()
+    private readonly AppService _appService;
+    public AppController(AppService appService)
     {
-        return "Asdasdas";
+        _appService = appService;
     }
-    // private readonly Context _context;
-    // public AppController(Context context)
-    // {
-    //     _context = context;
-    // }
 
-    // [HttpGet]
-    // public async Task<ActionResult<Relatorio[]>> Get()
-    // {
-    //     IEnumerable<Relatorio> relatorio = _context.Relatorios.ToList();
-    //     return Ok(relatorio);
-    // }
+    [HttpGet("MongoPrefeitura")]
+    public string DBPrefeitura()
+    {
+        var settings = new MongoClientSettings()
+        {
+            Scheme = ConnectionStringScheme.MongoDB,
+            Server = new MongoServerAddress("172.30.101.233", 27017),
+            Credential = MongoCredential.CreateCredential("admin", "mongoadmin", "q1w2e3r4$"),
+            AllowInsecureTls = true
+        };
 
-    // [HttpGet("{id}")]
-    // public async Task<ActionResult<Relatorio>> GetId(string id)
-    // {
-    //     var relatorio = _context.Relatorios.FirstOrDefault(x => x.Id == id);
-    //     return Ok(relatorio);
-    // }
+        var client = new MongoClient(settings);
 
-    // [HttpPost]
-    // public async Task<ActionResult<Relatorio>> Post(Relatorio relatorio)
-    // {
-    //     _context.Add(relatorio);
-    //     _context.SaveChanges();
-    //     return Ok(relatorio);
-    // }
+
+        return client.ListDatabaseNames().ToList().ToJson();
+    }
+
+    [HttpGet]
+    public async Task<List<Relatorio>> Get() =>
+        await _appService.PegarRelatoriosTotal();
+        
+
+    [HttpGet("id")]
+    public async Task<List<Relatorio>> Get(string id)
+    {
+        var relatorio = await _appService.PegarRelatorioPorIdUsuario(id);
+        return relatorio;
+    }
+
+    [HttpPost]
+    public async Task<IActionResult> Post(Relatorio relatorio)
+    {
+        await _appService.CriarRelatorio(relatorio);
+
+        return CreatedAtAction(nameof(Get), new { id = relatorio.Id }, relatorio);
+    }
+
+    [HttpPut("id")]
+    public async Task<IActionResult> Update(string id, Relatorio atualizarRelatorio)
+    {
+        var relatorio = await _appService.PegarRelatorioId(id);
+
+        if (relatorio is null)
+        {
+            return NotFound();
+        }
+
+        atualizarRelatorio.Id = relatorio.Id;
+
+        await _appService.AtualizarRelatorio(id, atualizarRelatorio);
+
+        return NoContent();
+    }
+
+    [HttpDelete("id")]
+    public async Task<IActionResult> Delete(string id)
+    {
+        var relatorio = await _appService.PegarRelatorioId(id);
+
+        if (relatorio is null)
+        {
+            return NotFound();
+        }
+
+        await _appService.RemoverRelatorioPorId(id);
+
+        return NoContent();
+    }
 }

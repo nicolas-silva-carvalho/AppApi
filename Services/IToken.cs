@@ -3,10 +3,11 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using ApiAPP.Models;
-using Microsoft.EntityFrameworkCore;
 
-namespace ApiAPP.Data
+namespace AppApi.Services
 {
-    public class Context 
-    {}
+    public interface IToken
+    {
+        Task<string> CriarToken(UsuarioLogin usuario);
+    }
 }

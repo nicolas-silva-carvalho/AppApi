@@ -6,6 +6,11 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Newtonsoft.Json;
+using AutoMapper;
+using AppApi.Services;
+using ApiAPP.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.OpenApi.Models;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -27,12 +32,47 @@ builder.Services
         };
     });
 
+builder.Services.AddCors();
 builder.Services.Configure<ApiAppDatabase>(builder.Configuration.GetSection("RelatorioDatabase"));
+
 builder.Services.AddSingleton<ApiAppDatabase>();
 builder.Services.AddSingleton<AppService>();
+
+builder.Services.AddScoped<IToken, TokenService>();
+
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(options => 
+    {
+        options.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme 
+        {
+            Description = @"JWT Authorization header usando Bearer.
+                            Entre com o 'Bearer' [espaço] então coloque seu token.
+                            Exemplo: 'Bearer 123abcdef'",
+            Name = "Authorization",
+            In = ParameterLocation.Header,
+            Type = SecuritySchemeType.ApiKey,
+            Scheme = "Bearer"
+        });
+
+        options.AddSecurityRequirement(new OpenApiSecurityRequirement() 
+        {
+            {
+                new OpenApiSecurityScheme
+                {
+                    Reference = new OpenApiReference
+                    {
+                        Type = ReferenceType.SecurityScheme,
+                        Id = "Bearer"
+                    },
+                    Scheme = "oauth2",
+                    Name = "Bearer",
+                    In = ParameterLocation.Header
+                },
+                new List<string>() 
+            }
+        });
+    });
 
 var app = builder.Build();
 
@@ -43,10 +83,13 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 
-//app.UseHttpsRedirection();
+app.UseCors(acesso => { acesso.AllowAnyHeader(); acesso.AllowAnyMethod(); acesso.AllowAnyOrigin(); });
+app.UseHttpsRedirection();
 
 app.UseAuthentication();
 app.UseAuthorization();
+
+
 app.MapControllers();
 
 
