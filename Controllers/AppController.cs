@@ -8,32 +8,18 @@ using Microsoft.AspNetCore.Authorization;
 
 namespace ApiAPP.Controllers;
 
+[Authorize]
 [ApiController]
 [Route("[controller]")]
 
 public class AppController : ControllerBase
 {
     private readonly AppService _appService;
-    public AppController(AppService appService)
+    private readonly IHttpContextAccessor _ihttpContextAccessor;
+    public AppController(AppService appService, IHttpContextAccessor ihttpContextAccessor)
     {
+        _ihttpContextAccessor = ihttpContextAccessor;
         _appService = appService;
-    }
-
-    [HttpGet("MongoPrefeitura")]
-    public string DBPrefeitura()
-    {
-        var settings = new MongoClientSettings()
-        {
-            Scheme = ConnectionStringScheme.MongoDB,
-            Server = new MongoServerAddress("172.30.101.233", 27017),
-            Credential = MongoCredential.CreateCredential("admin", "mongoadmin", "q1w2e3r4$"),
-            AllowInsecureTls = true
-        };
-
-        var client = new MongoClient(settings);
-
-
-        return client.ListDatabaseNames().ToList().ToJson();
     }
 
     [HttpGet]
@@ -49,12 +35,12 @@ public class AppController : ControllerBase
     // }
 
     [HttpPost]
-    [AllowAnonymous]
     public async Task<IActionResult> Post(Relatorio relatorio)
     {
+        var user = _ihttpContextAccessor.HttpContext.User.Claims.ToList();
         await _appService.CriarRelatorio(relatorio);
 
-        return CreatedAtAction(nameof(Get), new { id = relatorio.RelatorioId }, relatorio);
+        return CreatedAtAction(nameof(Get), new { id = relatorio.Id }, relatorio);
     }
 
     [HttpPut("id")]
@@ -67,7 +53,7 @@ public class AppController : ControllerBase
             return NotFound();
         }
 
-        atualizarRelatorio.RelatorioId = relatorio.RelatorioId;
+        atualizarRelatorio.Id = relatorio.Id;
 
         await _appService.AtualizarRelatorio(id, atualizarRelatorio);
 

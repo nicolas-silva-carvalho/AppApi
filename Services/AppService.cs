@@ -9,22 +9,23 @@ using MongoDB.Driver;
 using MongoDB.Driver.Core.Configuration;
 using MongoDB.Bson;
 using AppApi.Services;
+using ApiAPP.Data.Map;
 
 namespace ApiAPP.Services
 {
     public class AppService
     {
         private readonly IMongoCollection<Relatorio> _mongoColletion;
-        public AppService(IOptions<ApiAppDatabase> _AppApiDatabaseSettings)
+        private readonly ConexaoBancoPrefeitura _conexaoBancoPrefeitura;
+        private readonly IHttpContextAccessor _acessor;
+
+        public AppService(IOptions<ApiAppDatabase> _AppApiDatabaseSettings, ConexaoBancoPrefeitura conexaoBancoPrefeitura, IHttpContextAccessor acessor)
         {
-            var mongoClient = new MongoClient(
-            _AppApiDatabaseSettings.Value.ConnectionString);
-
-            var mongoDatabase = mongoClient.GetDatabase(
-                _AppApiDatabaseSettings.Value.DatabaseName);
-
-            _mongoColletion = mongoDatabase.GetCollection<Relatorio>(
-                _AppApiDatabaseSettings.Value.RelatoriosCollectionName);
+            _acessor = acessor;
+            _conexaoBancoPrefeitura = conexaoBancoPrefeitura;
+            var mongoClient = new MongoClient((MongoClientSettings)_conexaoBancoPrefeitura.conexao());
+            var mongoDatabase = mongoClient.GetDatabase("Relatorio");
+            _mongoColletion = mongoDatabase.GetCollection<Relatorio>("Relatorios");
         }
 
         public async Task<List<Relatorio>> PegarRelatoriosTotal() =>
@@ -32,19 +33,20 @@ namespace ApiAPP.Services
 
 
         public async Task<Relatorio> PegarRelatorioId(string id) =>
-            await _mongoColletion.Find(x => x.RelatorioId == id).FirstOrDefaultAsync();
+            await _mongoColletion.Find(x => x.Id == id).FirstOrDefaultAsync();
 
 
-        public async Task CriarRelatorio(Relatorio relatorio) =>
+        public async Task CriarRelatorio(Relatorio relatorio)
+        {
             await _mongoColletion.InsertOneAsync(relatorio);
-
+        }
 
         public async Task AtualizarRelatorio(string id, Relatorio atualizarRelatorio) =>
-            await _mongoColletion.ReplaceOneAsync(x => x.RelatorioId == id, atualizarRelatorio);
+            await _mongoColletion.ReplaceOneAsync(x => x.Id == id, atualizarRelatorio);
 
 
         public async Task RemoverRelatorioPorId(string id) =>
-         await _mongoColletion.DeleteOneAsync(x => x.RelatorioId == id);
+         await _mongoColletion.DeleteOneAsync(x => x.Id == id);
 
         public async Task<List<Relatorio>> PegarRelatorioPorIdUsuario(string usuarioId)
         {

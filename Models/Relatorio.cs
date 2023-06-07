@@ -12,7 +12,7 @@ namespace ApiAPP.Models
     public class Relatorio
     {
         [BsonId]
-        public string RelatorioId { get; set; }
+        public string Id { get; set; }
         public string NomeLocal { get; set; } = default!;
         public string NotaIntrodutoria { get; set; } = default!;
         public string Origem { get; set; } = default!;
@@ -23,7 +23,7 @@ namespace ApiAPP.Models
         public string EquipamentoPublico { get; set; } = default!;
         public string EnderecoLocal { get; set; } = default!;
         public DateTime DataCriacao { get; set; }
-        public DateTime? DataModificacao { get; set; }
+        public DateTime? DataModificacao { get; set; } = null;
         public string UsuarioId { get; set; }
     }
 }

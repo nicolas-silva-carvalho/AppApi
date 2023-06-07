@@ -11,14 +11,11 @@ namespace ApiAPP.Models
 {
     public class Usuario
     {
-        [BsonId]
-        public string UsuarioId { get; set; }
-        public string Nome { get; set; } = default!;
-        public string Senha { get; set; } = default!;
-        public string Email { get; set; } = default!;
-        public string Telefone { get; set; } = default!;
-        public string FotoUrl { get; set; } = default!;
-        public string Token { get; set; } = default!;
-        
+        public string Id { get; set; }
+        public string Nome { get; set; }
+        public string Senha { get; set; }
+        public string Email { get; set; }
+        public string Telefone { get; set; }
+        public string FotoUrl { get; set; }
     }
 }

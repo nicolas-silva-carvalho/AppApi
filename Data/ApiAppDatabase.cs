@@ -8,9 +8,7 @@ namespace ApiAPP.Data
     public class ApiAppDatabase
     {
         public string ConnectionString { get; set; } = null!;
-
         public string DatabaseName { get; set; } = null!;
-
         public string RelatoriosCollectionName { get; set; } = null!;
         public string UsuarioCollectionName { get; set; } = null!;
     }

@@ -38,12 +38,14 @@ builder.Services.AddCors();
 builder.Services.Configure<ApiAppDatabase>(builder.Configuration.GetSection("RelatorioDatabase"));
 
 builder.Services.AddSingleton<ApiAppDatabase>();
+builder.Services.AddSingleton<ConexaoBancoPrefeitura>();
 
 builder.Services.AddScoped<ProfileAPP>();
 builder.Services.AddSingleton<AppService>();
 builder.Services.AddSingleton<UsuarioService>();
-builder.Services.AddScoped<IToken, TokenService>();
 
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+builder.Services.AddScoped<IToken, TokenService>();
 
 builder.Services.AddControllers().AddNewtonsoftJson(options => options.SerializerSettings.ReferenceLoopHandling = ReferenceLoopHandling.Ignore);
 builder.Services.AddEndpointsApiExplorer();
@@ -94,8 +96,6 @@ app.UseHttpsRedirection();
 app.UseAuthentication();
 app.UseAuthorization();
 
-
 app.MapControllers();
-
 
 app.Run();
